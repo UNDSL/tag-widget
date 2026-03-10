@@ -38,53 +38,42 @@ const tagList = [
 "Billing Issue",
 "Abuse Report",
 "Technical Issue",
-"General Inquiry",
-"Follow Up"
+"General Inquiry"
 ]
 
 let selectedTags = []
 
-function renderTags(){
+function toggleTag(tag, element){
 
-let container = document.getElementById("tags")
-container.innerHTML=""
+if(selectedTags.includes(tag)){
+ selectedTags = selectedTags.filter(t => t !== tag)
+ element.classList.remove("active")
+}
+else{
+ selectedTags.push(tag)
+ element.classList.add("active")
+}
 
-tagList.forEach(tag=>{
+saveTags()
 
-let div = document.createElement("div")
-div.className="tag"
-div.innerText=tag
+}
 
-div.onclick=()=>toggleTag(tag,div)
+function saveTags(){
 
-container.appendChild(div)
+let value = selectedTags.join(",")
 
+if(window.desktopAgent){
+
+window.desktopAgent.updateTask({
+ Call_Tags: value
 })
 
 }
 
-function toggleTag(tag,element){
-
-if(selectedTags.includes(tag)){
-selectedTags=selectedTags.filter(t=>t!==tag)
-element.classList.remove("active")
 }
-else{
-selectedTags.push(tag)
-element.classList.add("active")
-}
-
-let value = selectedTags.join(",")
-
-if(window.agentx){
-window.agentx.setCallVariable("Call_Tags",value)
-}
-
-}
-
-renderTags()
 
 </script>
 
 </body>
+
 </html>
