@@ -1,35 +1,21 @@
 <!DOCTYPE html>
 <html>
 <head>
-
 <meta charset="UTF-8">
 
-<script src="https://unpkg.com/@cisco/agentx-sdk/dist/agentx-sdk.js"></script>
-
 <style>
-
 body{
  font-family: Arial;
- padding:15px;
- background:#f5f5f5;
-}
-
-.tag-container{
- display:flex;
- flex-wrap:wrap;
+ padding:20px;
 }
 
 .tag{
- padding:8px 14px;
- margin:6px;
- border-radius:20px;
+ display:inline-block;
+ padding:10px;
+ margin:5px;
  background:#e0e0e0;
+ border-radius:20px;
  cursor:pointer;
-}
-
-.tag.active{
- background:#007AA3;
- color:white;
 }
 
 </style>
@@ -40,89 +26,30 @@ body{
 
 <h3>Call Tags</h3>
 
-<div id="tags" class="tag-container"></div>
+<div id="tags"></div>
 
 <script>
 
-const agentx = new AgentX()
+console.log("Widget loaded")
 
-let currentTaskId = null
-
-agentx.init()
-
-agentx.on("task:active", function(task){
-
- currentTaskId = task.id
-
- console.log("Active task detected:", currentTaskId)
-
-})
-
-const tagList = [
+const tags = [
 "Complaint",
 "Billing Issue",
-"Technical Issue",
-"Abuse Report",
-"General Inquiry"
+"Technical Issue"
 ]
-
-let selectedTags = []
-
-function renderTags(){
 
 const container = document.getElementById("tags")
 
-tagList.forEach(tag => {
+tags.forEach(tag => {
 
-const div = document.createElement("div")
+ const div = document.createElement("div")
 
-div.className = "tag"
-div.innerText = tag
+ div.className="tag"
+ div.innerText = tag
 
-div.onclick = () => toggleTag(tag, div)
-
-container.appendChild(div)
+ container.appendChild(div)
 
 })
-
-}
-
-function toggleTag(tag, element){
-
-if(selectedTags.includes(tag)){
-
- selectedTags = selectedTags.filter(t => t !== tag)
- element.classList.remove("active")
-
-}else{
-
- selectedTags.push(tag)
- element.classList.add("active")
-
-}
-
-saveTags()
-
-}
-
-function saveTags(){
-
-if(!currentTaskId){
- console.log("No active interaction")
- return
-}
-
-let value = selectedTags.join(",")
-
-console.log("Updating Call_Tags:", value)
-
-agentx.updateTask(currentTaskId,{
- Call_Tags:value
-})
-
-}
-
-renderTags()
 
 </script>
 
