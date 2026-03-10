@@ -1,19 +1,18 @@
 <!DOCTYPE html>
 <html>
+
 <head>
 
 <meta charset="UTF-8">
 
+<script src="https://unpkg.com/@cisco/agentx-sdk@latest/dist/agentx-sdk.js"></script>
+
 <style>
 
 body{
- font-family: Arial, Helvetica, sans-serif;
+ font-family: Arial;
  padding:15px;
  background:#f5f5f5;
-}
-
-h3{
- margin-top:0;
 }
 
 .tag-container{
@@ -27,23 +26,11 @@ h3{
  border-radius:20px;
  background:#e0e0e0;
  cursor:pointer;
- font-size:13px;
- transition:all .2s;
-}
-
-.tag:hover{
- background:#d2d2d2;
 }
 
 .tag.active{
  background:#007AA3;
  color:white;
-}
-
-.status{
- margin-top:10px;
- font-size:12px;
- color:#666;
 }
 
 </style>
@@ -54,11 +41,7 @@ h3{
 
 <h3>Call Tags</h3>
 
-<div class="tag-container" id="tagContainer"></div>
-
-<div class="status" id="status">
-No tags selected
-</div>
+<div id="tags" class="tag-container"></div>
 
 <script>
 
@@ -67,28 +50,27 @@ const tagList = [
 "Billing Issue",
 "Technical Issue",
 "Abuse Report",
-"General Inquiry",
-"Follow Up Required",
-"Service Delay",
-"Information Request"
+"General Inquiry"
 ]
 
 let selectedTags = []
 
+const agentx = new AgentX()
+
+agentx.init()
+
 function renderTags(){
 
-const container = document.getElementById("tagContainer")
+const container = document.getElementById("tags")
 
 tagList.forEach(tag => {
 
 const div = document.createElement("div")
 
-div.className="tag"
-div.innerText=tag
+div.className = "tag"
+div.innerText = tag
 
-div.onclick = function(){
- toggleTag(tag, div)
-}
+div.onclick = () => toggleTag(tag, div)
 
 container.appendChild(div)
 
@@ -110,20 +92,7 @@ if(selectedTags.includes(tag)){
 
 }
 
-updateStatus()
 saveTags()
-
-}
-
-function updateStatus(){
-
-const status = document.getElementById("status")
-
-if(selectedTags.length === 0){
- status.innerText = "No tags selected"
-}else{
- status.innerText = "Selected: " + selectedTags.join(", ")
-}
 
 }
 
@@ -131,29 +100,11 @@ function saveTags(){
 
 let value = selectedTags.join(",")
 
-console.log("Saving Tags:", value)
+console.log("Saving:", value)
 
-try{
-
- if(window.agentx){
-
-  window.agentx.updateTask({
-   Call_Tags: value
-  })
-
-  console.log("Tags sent to interaction")
-
- }else{
-
-  console.log("AgentX SDK not detected (normal if testing in browser)")
-
- }
-
-}catch(e){
-
- console.log("Error sending tags:", e)
-
-}
+agentx.updateTask({
+ Call_Tags: value
+})
 
 }
 
@@ -162,4 +113,5 @@ renderTags()
 </script>
 
 </body>
+
 </html>
