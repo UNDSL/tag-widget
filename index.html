@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html>
+<head>
+<style>
+
+body{
+font-family:Arial;
+padding:10px;
+}
+
+.tag{
+display:inline-block;
+padding:8px 12px;
+margin:5px;
+border-radius:20px;
+background:#eee;
+cursor:pointer;
+}
+
+.tag.active{
+background:#007AA3;
+color:white;
+}
+
+</style>
+</head>
+
+<body>
+
+<h3>Call Tags</h3>
+
+<div id="tags"></div>
+
+<script>
+
+const tagList = [
+"Complaint",
+"Billing Issue",
+"Abuse Report",
+"Technical Issue",
+"General Inquiry",
+"Follow Up"
+]
+
+let selectedTags = []
+
+function renderTags(){
+
+let container = document.getElementById("tags")
+container.innerHTML=""
+
+tagList.forEach(tag=>{
+
+let div = document.createElement("div")
+div.className="tag"
+div.innerText=tag
+
+div.onclick=()=>toggleTag(tag,div)
+
+container.appendChild(div)
+
+})
+
+}
+
+function toggleTag(tag,element){
+
+if(selectedTags.includes(tag)){
+selectedTags=selectedTags.filter(t=>t!==tag)
+element.classList.remove("active")
+}
+else{
+selectedTags.push(tag)
+element.classList.add("active")
+}
+
+let value = selectedTags.join(",")
+
+if(window.agentx){
+window.agentx.setCallVariable("Call_Tags",value)
+}
+
+}
+
+renderTags()
+
+</script>
+
+</body>
+</html>
