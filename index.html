@@ -1,11 +1,10 @@
 <!DOCTYPE html>
 <html>
-
 <head>
 
 <meta charset="UTF-8">
 
-<script src="https://unpkg.com/@cisco/agentx-sdk@latest/dist/agentx-sdk.js"></script>
+<script src="https://unpkg.com/@cisco/agentx-sdk/dist/agentx-sdk.js"></script>
 
 <style>
 
@@ -45,6 +44,20 @@ body{
 
 <script>
 
+const agentx = new AgentX()
+
+let currentTaskId = null
+
+agentx.init()
+
+agentx.on("task:active", function(task){
+
+ currentTaskId = task.id
+
+ console.log("Active task detected:", currentTaskId)
+
+})
+
 const tagList = [
 "Complaint",
 "Billing Issue",
@@ -54,10 +67,6 @@ const tagList = [
 ]
 
 let selectedTags = []
-
-const agentx = new AgentX()
-
-agentx.init()
 
 function renderTags(){
 
@@ -98,12 +107,17 @@ saveTags()
 
 function saveTags(){
 
+if(!currentTaskId){
+ console.log("No active interaction")
+ return
+}
+
 let value = selectedTags.join(",")
 
-console.log("Saving:", value)
+console.log("Updating Call_Tags:", value)
 
-agentx.updateTask({
- Call_Tags: value
+agentx.updateTask(currentTaskId,{
+ Call_Tags:value
 })
 
 }
@@ -113,5 +127,4 @@ renderTags()
 </script>
 
 </body>
-
 </html>
