@@ -1,32 +1,28 @@
 <!DOCTYPE html>
 <html>
 <head>
-<meta charset="UTF-8">
+
+<script src="https://unpkg.com/@wxcc-desktop/sdk"></script>
 
 <style>
 
 body{
- font-family: Arial;
- padding:20px;
+font-family: Arial;
+padding:15px;
 }
 
 .tag{
- display:inline-block;
- padding:10px 16px;
- margin:6px;
- background:#e0e0e0;
- border-radius:20px;
- cursor:pointer;
- transition:0.2s;
+display:inline-block;
+padding:8px 12px;
+margin:5px;
+background:#0f62fe;
+color:white;
+border-radius:20px;
+cursor:pointer;
 }
 
 .tag:hover{
- background:#d5d5d5;
-}
-
-.tag.active{
- background:#007aa3;
- color:white;
+background:#0043ce;
 }
 
 </style>
@@ -37,104 +33,31 @@ body{
 
 <h3>Call Tags</h3>
 
-<div id="tags"></div>
-
-<script src="https://unpkg.com/@wxcc-desktop/sdk@latest/dist/index.js"></script>
+<div class="tag" onclick="setTag('Physical Abuse')">Physical Abuse</div>
+<div class="tag" onclick="setTag('Neglect')">Neglect</div>
+<div class="tag" onclick="setTag('Sexual Abuse')">Sexual Abuse</div>
+<div class="tag" onclick="setTag('Emergency')">Emergency</div>
+<div class="tag" onclick="setTag('False Report')">False Report</div>
 
 <script>
 
-let activeTask = null
-let selectedTags = []
+let desktop;
 
-const tags = [
-"Complaint",
-"Billing Issue",
-"Technical Issue",
-"Abuse Report",
-"General Inquiry",
-"Follow Up Required",
-"Service Delay",
-"Information Request"
-]
+window.onload = async function(){
 
-const container = document.getElementById("tags")
-
-/* Render Tags */
-
-tags.forEach(tag => {
-
- const div = document.createElement("div")
-
- div.className="tag"
- div.innerText = tag
-
- div.onclick = () => toggleTag(tag,div)
-
- container.appendChild(div)
-
-})
-
-/* Toggle Tag */
-
-function toggleTag(tag,element){
-
- if(selectedTags.includes(tag)){
-
-  selectedTags = selectedTags.filter(t => t !== tag)
-  element.classList.remove("active")
-
- }else{
-
-  selectedTags.push(tag)
-  element.classList.add("active")
-
- }
-
- saveTags()
+desktop = new window.Desktop.default();
+await desktop.init();
 
 }
 
-/* Save Tags to Call Variable */
+function setTag(tag){
 
-function saveTags(){
-
- if(!activeTask){
-  console.log("No active call yet")
-  return
- }
-
- const tagString = selectedTags.join(",")
-
- console.log("Saving Tags:", tagString)
-
- window.wxcc.agent.updateCallVariables({
-  interactionId: activeTask.interactionId,
-  variables:{
-   Call_Tags: tagString
-  }
- })
+desktop.actions.setVariable({
+variableName: "Call_Tags",
+value: tag
+});
 
 }
-
-/* Detect Active Interaction */
-
-window.addEventListener("load", async () => {
-
- try{
-
-  const task = await window.wxcc.agent.getActiveTask()
-
-  activeTask = task
-
-  console.log("Active interaction detected:", task)
-
- }catch(e){
-
-  console.log("No active task yet")
-
- }
-
-})
 
 </script>
 
