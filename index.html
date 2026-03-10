@@ -1,60 +1,130 @@
 <!DOCTYPE html>
 <html>
 <head>
+
+<meta charset="UTF-8">
+
 <style>
 
 body{
-font-family:Arial;
-padding:10px;
+ font-family: Arial, Helvetica, sans-serif;
+ padding: 15px;
+ background: #f7f7f7;
+}
+
+h3{
+ margin-top:0;
+}
+
+.tag-container{
+ display:flex;
+ flex-wrap:wrap;
 }
 
 .tag{
-display:inline-block;
-padding:8px 12px;
-margin:5px;
-border-radius:20px;
-background:#eee;
-cursor:pointer;
+ padding:8px 14px;
+ margin:6px;
+ border-radius:20px;
+ background:#e0e0e0;
+ cursor:pointer;
+ font-size:13px;
+ transition:all 0.2s ease;
+}
+
+.tag:hover{
+ background:#c7c7c7;
 }
 
 .tag.active{
-background:#007AA3;
-color:white;
+ background:#007AA3;
+ color:white;
+}
+
+.status{
+ margin-top:15px;
+ font-size:12px;
+ color:#666;
 }
 
 </style>
+
 </head>
 
 <body>
 
-<h3>Call Tags</h3>
+<h3>Interaction Tags</h3>
 
-<div id="tags"></div>
+<div class="tag-container" id="tagContainer"></div>
+
+<div class="status" id="status">
+No tags selected
+</div>
 
 <script>
 
 const tagList = [
 "Complaint",
 "Billing Issue",
-"Abuse Report",
 "Technical Issue",
-"General Inquiry"
+"Abuse Report",
+"General Inquiry",
+"Follow Up Required",
+"Service Delay",
+"Information Request"
 ]
 
 let selectedTags = []
 
+function renderTags(){
+
+const container = document.getElementById("tagContainer")
+
+tagList.forEach(tag => {
+
+const div = document.createElement("div")
+
+div.className="tag"
+div.innerText = tag
+
+div.onclick = () => toggleTag(tag, div)
+
+container.appendChild(div)
+
+})
+
+}
+
 function toggleTag(tag, element){
 
 if(selectedTags.includes(tag)){
- selectedTags = selectedTags.filter(t => t !== tag)
- element.classList.remove("active")
-}
-else{
- selectedTags.push(tag)
- element.classList.add("active")
+
+selectedTags = selectedTags.filter(t => t !== tag)
+
+element.classList.remove("active")
+
+}else{
+
+selectedTags.push(tag)
+
+element.classList.add("active")
+
 }
 
 saveTags()
+
+updateStatus()
+
+}
+
+function updateStatus(){
+
+const status = document.getElementById("status")
+
+if(selectedTags.length === 0){
+ status.innerText = "No tags selected"
+}else{
+ status.innerText = "Selected: " + selectedTags.join(", ")
+}
 
 }
 
@@ -62,18 +132,31 @@ function saveTags(){
 
 let value = selectedTags.join(",")
 
+console.log("Saving Tags:", value)
+
+try{
+
 if(window.desktopAgent){
 
 window.desktopAgent.updateTask({
  Call_Tags: value
 })
 
+console.log("Tags sent to interaction")
+
+}
+
+}catch(e){
+
+console.log("Desktop SDK not detected")
+
 }
 
 }
+
+renderTags()
 
 </script>
 
 </body>
-
 </html>
