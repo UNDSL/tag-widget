@@ -2,7 +2,34 @@
 <html>
 <head>
 
-<script src="https://unpkg.com/@wxcc-desktop/sdk"></script>
+<script type="module">
+
+import { Desktop } from "https://cdn.jsdelivr.net/npm/@wxcc-desktop/sdk/dist/index.js";
+
+Desktop.config.init();
+
+function setTag(tag){
+
+    const contact = Desktop.store.agentContact;
+
+    if(!contact){
+        console.log("No active contact");
+        return;
+    }
+
+    Desktop.actions.updateContact({
+        data:{
+            callAssociatedData:{
+                Call_Tags: tag
+            }
+        }
+    });
+
+}
+
+window.setTag = setTag;
+
+</script>
 
 <style>
 
@@ -13,8 +40,8 @@ padding:15px;
 
 .tag{
 display:inline-block;
-padding:8px 12px;
-margin:5px;
+padding:8px 14px;
+margin:6px;
 background:#0f62fe;
 color:white;
 border-radius:20px;
@@ -33,33 +60,10 @@ background:#0043ce;
 
 <h3>Call Tags</h3>
 
-<div class="tag" onclick="setTag('Physical Abuse')">Physical Abuse</div>
 <div class="tag" onclick="setTag('Neglect')">Neglect</div>
+<div class="tag" onclick="setTag('Physical Abuse')">Physical Abuse</div>
 <div class="tag" onclick="setTag('Sexual Abuse')">Sexual Abuse</div>
 <div class="tag" onclick="setTag('Emergency')">Emergency</div>
-<div class="tag" onclick="setTag('False Report')">False Report</div>
-
-<script>
-
-let desktop;
-
-window.onload = async function(){
-
-desktop = new window.Desktop.default();
-await desktop.init();
-
-}
-
-function setTag(tag){
-
-desktop.actions.setVariable({
-variableName: "Call_Tags",
-value: tag
-});
-
-}
-
-</script>
 
 </body>
 </html>
