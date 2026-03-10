@@ -4,6 +4,7 @@
 <meta charset="UTF-8">
 
 <style>
+
 body{
  font-family: Arial;
  padding:20px;
@@ -12,16 +13,22 @@ body{
 .tag{
  display:inline-block;
  padding:10px 16px;
- margin:5px;
+ margin:6px;
  background:#e0e0e0;
  border-radius:20px;
  cursor:pointer;
+ transition:0.2s;
+}
+
+.tag:hover{
+ background:#d5d5d5;
 }
 
 .tag.active{
  background:#007aa3;
  color:white;
 }
+
 </style>
 
 </head>
@@ -52,6 +59,8 @@ const tags = [
 
 const container = document.getElementById("tags")
 
+/* Render Tags */
+
 tags.forEach(tag => {
 
  const div = document.createElement("div")
@@ -65,50 +74,65 @@ tags.forEach(tag => {
 
 })
 
+/* Toggle Tag */
+
 function toggleTag(tag,element){
 
  if(selectedTags.includes(tag)){
+
   selectedTags = selectedTags.filter(t => t !== tag)
   element.classList.remove("active")
- } else {
+
+ }else{
+
   selectedTags.push(tag)
   element.classList.add("active")
+
  }
 
  saveTags()
 
 }
 
+/* Save Tags to Call Variable */
+
 function saveTags(){
 
  if(!activeTask){
-  console.log("No active task")
+  console.log("No active call yet")
   return
  }
 
  const tagString = selectedTags.join(",")
 
- console.log("Saving tags:", tagString)
+ console.log("Saving Tags:", tagString)
 
- window.wxcc.agent.updateInteraction({
+ window.wxcc.agent.updateCallVariables({
   interactionId: activeTask.interactionId,
-  data:{
+  variables:{
    Call_Tags: tagString
   }
  })
 
 }
 
-window.addEventListener("load", () => {
+/* Detect Active Interaction */
 
- const sdk = window.wxcc
+window.addEventListener("load", async () => {
 
- sdk.agent.getActiveTask().then(task => {
+ try{
+
+  const task = await window.wxcc.agent.getActiveTask()
 
   activeTask = task
-  console.log("Active task detected:", task)
 
- })
+  console.log("Active interaction detected:", task)
+
+ }catch(e){
+
+  console.log("No active task yet")
+
+ }
 
 })
 
