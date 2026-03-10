@@ -11,13 +11,17 @@ body{
 
 .tag{
  display:inline-block;
- padding:10px;
+ padding:10px 16px;
  margin:5px;
  background:#e0e0e0;
  border-radius:20px;
  cursor:pointer;
 }
 
+.tag.active{
+ background:#007aa3;
+ color:white;
+}
 </style>
 
 </head>
@@ -28,14 +32,22 @@ body{
 
 <div id="tags"></div>
 
+<script src="https://unpkg.com/@wxcc-desktop/sdk@latest/dist/index.js"></script>
+
 <script>
 
-console.log("Widget loaded")
+let activeTask = null
+let selectedTags = []
 
 const tags = [
 "Complaint",
 "Billing Issue",
-"Technical Issue"
+"Technical Issue",
+"Abuse Report",
+"General Inquiry",
+"Follow Up Required",
+"Service Delay",
+"Information Request"
 ]
 
 const container = document.getElementById("tags")
@@ -47,7 +59,56 @@ tags.forEach(tag => {
  div.className="tag"
  div.innerText = tag
 
+ div.onclick = () => toggleTag(tag,div)
+
  container.appendChild(div)
+
+})
+
+function toggleTag(tag,element){
+
+ if(selectedTags.includes(tag)){
+  selectedTags = selectedTags.filter(t => t !== tag)
+  element.classList.remove("active")
+ } else {
+  selectedTags.push(tag)
+  element.classList.add("active")
+ }
+
+ saveTags()
+
+}
+
+function saveTags(){
+
+ if(!activeTask){
+  console.log("No active task")
+  return
+ }
+
+ const tagString = selectedTags.join(",")
+
+ console.log("Saving tags:", tagString)
+
+ window.wxcc.agent.updateInteraction({
+  interactionId: activeTask.interactionId,
+  data:{
+   Call_Tags: tagString
+  }
+ })
+
+}
+
+window.addEventListener("load", () => {
+
+ const sdk = window.wxcc
+
+ sdk.agent.getActiveTask().then(task => {
+
+  activeTask = task
+  console.log("Active task detected:", task)
+
+ })
 
 })
 
